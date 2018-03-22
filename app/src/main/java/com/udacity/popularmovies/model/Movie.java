@@ -10,12 +10,21 @@ import java.util.Date;
  */
 
 public class Movie implements Parcelable {
+    private int id;
     private String title;
+    private String originalTitle;
     private String imageUrl;
     private String overview;
-    private int voteAverage;
+    private double voteAverage;
     private Date releaseDate;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
     public String getTitle() {
         return title;
     }
@@ -40,11 +49,11 @@ public class Movie implements Parcelable {
         this.overview = overview;
     }
 
-    public int getVoteAverage() {
+    public double getVoteAverage() {
         return voteAverage;
     }
 
-    public void setVoteAverage(int voteAverage) {
+    public void setVoteAverage(double voteAverage) {
         this.voteAverage = voteAverage;
     }
 
@@ -56,6 +65,14 @@ public class Movie implements Parcelable {
         this.releaseDate = releaseDate;
     }
 
+    public String getOriginalTitle() {
+        return originalTitle;
+    }
+
+    public void setOriginalTitle(String originalTitle) {
+        this.originalTitle = originalTitle;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -63,22 +80,37 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
         dest.writeString(title);
+        dest.writeString(originalTitle);
         dest.writeString(imageUrl);
         dest.writeString(overview);
-        dest.writeInt(voteAverage);
-        dest.writeLong(releaseDate.getTime());
+        dest.writeDouble(voteAverage);
+        if(releaseDate != null) {
+            dest.writeLong(releaseDate.getTime());
+        }else {
+            dest.writeLong(0);
+        }
+    }
+
+    public Movie() {
+
     }
 
     private Movie(Parcel in){
+        id = in.readInt();
         title = in.readString();
+        originalTitle = in.readString();
         imageUrl = in.readString();
         overview = in.readString();
-        voteAverage = in.readInt();
-        releaseDate = new Date(in.readLong());
+        voteAverage = in.readDouble();
+        long date = in.readLong();
+        if(date != 0) {
+            releaseDate = new Date(date);
+        }
     }
 
-    public final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
         @Override
         public Movie createFromParcel(Parcel parcel) {
             return new Movie(parcel);

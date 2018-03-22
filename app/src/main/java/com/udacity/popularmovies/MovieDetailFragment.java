@@ -1,15 +1,19 @@
 package com.udacity.popularmovies;
 
-import android.app.Activity;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.udacity.popularmovies.dummy.DummyContent;
+import com.squareup.picasso.Picasso;
+import com.udacity.popularmovies.model.Movie;
+import com.udacity.popularmovies.utils.NetworkUtils;
+
+import java.text.SimpleDateFormat;
 
 /**
  * A fragment representing a single Movie detail screen.
@@ -18,21 +22,11 @@ import com.udacity.popularmovies.dummy.DummyContent;
  * on handsets.
  */
 public class MovieDetailFragment extends Fragment {
-    /**
-     * The fragment argument representing the item ID that this fragment
-     * represents.
-     */
-    public static final String ARG_ITEM_ID = "item_id";
 
-    /**
-     * The dummy content this fragment is presenting.
-     */
-    private DummyContent.DummyItem mItem;
+    public static final String ARG_MOVIE = "movie";
+    public static final SimpleDateFormat yearDateFormat = new SimpleDateFormat("YYYY");
+    private Movie item;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public MovieDetailFragment() {
     }
 
@@ -40,17 +34,8 @@ public class MovieDetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
-            // Load the dummy content specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load content from a content provider.
-            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
-
-            Activity activity = this.getActivity();
-            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-            if (appBarLayout != null) {
-                appBarLayout.setTitle(mItem.content);
-            }
+        if (getArguments().containsKey(ARG_MOVIE)) {
+            item = getArguments().getParcelable(ARG_MOVIE);
         }
     }
 
@@ -59,9 +44,37 @@ public class MovieDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.movie_detail, container, false);
 
-        // Show the dummy content as text in a TextView.
-        if (mItem != null) {
-            ((TextView) rootView.findViewById(R.id.movie_detail)).setText(mItem.details);
+        TextView overview = (TextView) rootView.findViewById(R.id.movie_detail);
+        TextView originalTitle = (TextView) rootView.findViewById(R.id.tv_original_title);
+        TextView releaseDate = (TextView) rootView.findViewById(R.id.tv_release_date);
+        TextView voteAverage = (TextView) rootView.findViewById(R.id.tv_vote_average);
+        ImageView poster = (ImageView) rootView.findViewById(R.id.iv_poster);
+        CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) getActivity().findViewById(R.id.toolbar_layout);
+
+        if (item != null) {
+            overview.setText(item.getOverview());
+            originalTitle.setText(item.getOriginalTitle());
+            if(item.getReleaseDate()!=null) {
+                releaseDate.setText(yearDateFormat.format(item.getReleaseDate()));
+            }
+            voteAverage.setText(item.getVoteAverage() + "/10");
+
+            int width = (int) getResources().getDimension(R.dimen.column_width);
+            int height = (int) (width * 1.5);
+
+            poster.getLayoutParams().height = height;
+            poster.getLayoutParams().width = width;
+
+            Picasso.with(getContext())
+                    .load(NetworkUtils.IMAGE_BASE_URL + item.getImageUrl())
+                    .placeholder(R.drawable.placeholder)
+                    .error(R.drawable.error)
+                    .resize(width, height)
+                    .into(poster);
+
+            if (appBarLayout != null) {
+                appBarLayout.setTitle(item.getTitle());
+            }
         }
 
         return rootView;

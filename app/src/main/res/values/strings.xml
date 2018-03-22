@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <string name="title_movie_detail">Movie Detail</string>
+    <string name="error_message">There was an error getting the movie list. Please check your network connection.</string>
+    <string name="movie_poster">Movie poster</string>
+    <string name="action_setttings">Settings</string>
+    <string name="sort">Sort</string>
+    <string name="popularity">Popularity</string>
+    <string name="rating">Rating</string>
+    <string name="refresh">Refresh</string>
+    <string name="sort_by">Sort By:</string>
+
+    <string name="pref_sortby_key">sort_by</string>
 </resources>

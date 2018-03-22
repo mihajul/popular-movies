@@ -7,13 +7,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import com.udacity.popularmovies.MovieDetailActivity;
 import com.udacity.popularmovies.MovieDetailFragment;
 import com.udacity.popularmovies.MovieListActivity;
 import com.udacity.popularmovies.R;
-import com.udacity.popularmovies.dummy.DummyContent;
+import com.udacity.popularmovies.model.Movie;
+import com.udacity.popularmovies.utils.NetworkUtils;
 
 import java.util.List;
 
@@ -24,13 +27,11 @@ import java.util.List;
 public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecyclerViewAdapter.ViewHolder> {
 
     private final MovieListActivity mParentActivity;
-    private final List<DummyContent.DummyItem> mValues;
+    private List<Movie> mValues;
     private final boolean mTwoPane;
 
     public MovieRecyclerViewAdapter(MovieListActivity parent,
-                                    List<DummyContent.DummyItem> items,
                                     boolean twoPane) {
-        mValues = items;
         mParentActivity = parent;
         mTwoPane = twoPane;
     }
@@ -44,47 +45,74 @@ public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecycler
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        final Movie movie = mValues.get(position);
 
+        int width = (int) mParentActivity.getResources().getDimension(R.dimen.column_width);
+                //AndroidUtils.convertDpToPixel(MovieListActivity.COLUMN_WIDTH, mParentActivity);
+        int height = (int) ((double)width * 1.5);
+        Picasso.with(mParentActivity)
+                .load(NetworkUtils.IMAGE_BASE_URL + movie.getImageUrl())
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.error)
+                .resize(width, height)
+                .centerCrop()
+                .into(holder.mContentView , new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        holder.mTextView.setVisibility(View.INVISIBLE);
+                    }
+
+                    @Override
+                    public void onError() {
+                        holder.mTextView.setVisibility(View.VISIBLE);
+                    }
+                });
+        holder.mTextView.setText(movie.getTitle());
         holder.itemView.setTag(mValues.get(position));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
                                                @Override
                                                public void onClick(View view) {
-                                                   DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
-                                                   if (mTwoPane) {
-                                                       Bundle arguments = new Bundle();
-                                                       arguments.putString(MovieDetailFragment.ARG_ITEM_ID, item.id);
-                                                       MovieDetailFragment fragment = new MovieDetailFragment();
-                                                       fragment.setArguments(arguments);
-                                                       mParentActivity.getSupportFragmentManager().beginTransaction()
-                                                               .replace(R.id.movie_detail_container, fragment)
-                                                               .commit();
-                                                   } else {
-                                                       Context context = view.getContext();
-                                                       Intent intent = new Intent(context, MovieDetailActivity.class);
-                                                       intent.putExtra(MovieDetailFragment.ARG_ITEM_ID, item.id);
-
-                                                       context.startActivity(intent);
-                                                   }
+                                                   showDetailActivity(view, movie);
                                                }
                                            }
         );
     }
 
+    private void showDetailActivity(View view, Movie movie) {
+        if (mTwoPane) {
+            Bundle arguments = new Bundle();
+            arguments.putParcelable(MovieDetailFragment.ARG_MOVIE, movie);
+            MovieDetailFragment fragment = new MovieDetailFragment();
+            fragment.setArguments(arguments);
+            mParentActivity.getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.movie_detail_container, fragment)
+                    .commit();
+        } else {
+            Context context = view.getContext();
+            Intent intent = new Intent(context, MovieDetailActivity.class);
+            intent.putExtra(MovieDetailFragment.ARG_MOVIE, movie);
+            context.startActivity(intent);
+        }
+    }
+
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mValues == null ? 0 : mValues.size();
+    }
+
+    public void setData(List<Movie> data) {
+        mValues = data;
+        notifyDataSetChanged();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        final TextView mIdView;
-        final TextView mContentView;
+        final ImageView mContentView;
+        final TextView mTextView;
 
         ViewHolder(View view) {
             super(view);
-            mIdView = (TextView) view.findViewById(R.id.id_text);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            mContentView = (ImageView) view.findViewById(R.id.content);
+            mTextView = (TextView) view.findViewById(R.id.title);
         }
     }
 }
