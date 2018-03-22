@@ -17,7 +17,7 @@ import java.util.Scanner;
 
 public class NetworkUtils {
 
-    private static final String API_KEY = "3d77c5db95ca6f889d313a0c535c2e95";
+    private static final String API_KEY = "your-api-key";
     private static final String API_ROOT = "http://api.themoviedb.org/3/";
     private static final String LIST_POPULARITY_URL = API_ROOT + "movie/popular?api_key=" + API_KEY;
     private static final String LIST_RATING_URL = API_ROOT + "movie/top_rated?api_key=" + API_KEY;
