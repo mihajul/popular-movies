@@ -1,4 +1,4 @@
-# Sandwich Club Project Starter Code
+# Udacity Popular Movies Project Code
 
 **Note: Please set your MovieDB API key in the NetworkUtils.API_KEY variable**
 
