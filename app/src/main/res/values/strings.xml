@@ -6,9 +6,17 @@
     <string name="action_setttings">Settings</string>
     <string name="sort">Sort</string>
     <string name="popularity">Popularity</string>
+    <string name="favorites">Favorites</string>
     <string name="rating">Rating</string>
     <string name="refresh">Refresh</string>
     <string name="sort_by">Sort By:</string>
 
     <string name="pref_sortby_key">sort_by</string>
+    <string name="read_more">Read More</string>
+    <string name="reviews">Reviews</string>
+    <string name="error_message_reviews">There was an error getting the review list. Please check your network connection.</string>
+    <string name="no_reviews">There are no reviews for this movie yet</string>
+    <string name="trailers">Trailers</string>
+    <string name="error_message_trailers">There was an error getting the trailer list. Please check your network connection.</string>
+    <string name="no_trailers">There are no trailers for this movie yet</string>
 </resources>

@@ -8,23 +8,23 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/tv_reviews_title"
+        android:id="@+id/tv_trailers_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/reviews"
+        android:text="@string/trailers"
         android:textSize="20sp"
        />
 
     <TextView
-        android:id="@+id/tv_error_message_reviews"
+        android:id="@+id/tv_error_message_trailers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/error_message"
+        android:text="@string/error_message_trailers"
         android:visibility="gone"
         />
 
     <ProgressBar
-        android:id="@+id/pb_loading_indicator_reviews"
+        android:id="@+id/pb_loading_indicator_trailers"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_gravity="center"
@@ -33,13 +33,14 @@
 
 
     <android.support.v7.widget.RecyclerView
-    android:id="@+id/gv_reviews"
+    android:id="@+id/trailers_list"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="108dp"
     android:gravity="center"
     android:horizontalSpacing="10dp"
     android:verticalSpacing="10dp"
-    tools:listitem="@layout/review_detail"
+    tools:orientation="horizontal"
+    tools:listitem="@layout/trailer_detail"
     />
 
 </LinearLayout>

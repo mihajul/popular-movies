@@ -1,8 +1,9 @@
 package com.udacity.popularmovies.adapter;
 
-import android.content.Context;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.os.Bundle;
+import android.media.Image;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.SpannableString;
@@ -12,17 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.OvershootInterpolator;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.udacity.popularmovies.MovieDetailActivity;
 import com.udacity.popularmovies.MovieDetailFragment;
-import com.udacity.popularmovies.MovieListActivity;
 import com.udacity.popularmovies.R;
-import com.udacity.popularmovies.model.Movie;
 import com.udacity.popularmovies.model.Review;
+import com.udacity.popularmovies.model.Trailer;
 import com.udacity.popularmovies.utils.AndroidUtils;
 import com.udacity.popularmovies.utils.NetworkUtils;
 
@@ -34,60 +32,49 @@ import at.blogc.android.views.ExpandableTextView;
  * Created by Mihai on 4/20/2018.
  */
 
-public class ReviewsRecyclerViewAdapter extends RecyclerView.Adapter<ReviewsRecyclerViewAdapter.ViewHolder> {
+public class TrailersRecyclerViewAdapter extends RecyclerView.Adapter<TrailersRecyclerViewAdapter.ViewHolder> {
     private final MovieDetailFragment mParentFragment;
-    private List<Review> mValues;
+    private List<Trailer> mValues;
 
-    public ReviewsRecyclerViewAdapter(MovieDetailFragment parent) {
+    public TrailersRecyclerViewAdapter(MovieDetailFragment parent) {
         mParentFragment = parent;
     }
 
     @Override
-    public ReviewsRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public TrailersRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.review_detail, parent, false);
-        return new ReviewsRecyclerViewAdapter.ViewHolder(view);
+                .inflate(R.layout.trailer_detail, parent, false);
+        return new TrailersRecyclerViewAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ReviewsRecyclerViewAdapter.ViewHolder holder, int position) {
-        final Review review = mValues.get(position);
+    public void onBindViewHolder(final TrailersRecyclerViewAdapter.ViewHolder holder, int position) {
+        final Trailer trailer = mValues.get(position);
 
-        holder.author.setText(review.getAuthor());
+        Picasso.with(mParentFragment.getContext())
+                .load(String.format(NetworkUtils.TRAILER_IMAGE_URL, trailer.getKey()))
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.error)
+                .into(holder.image);
 
-        String content = review.getContent()
-                .replace("\n", "<br/>")
-                .replaceAll("\\*\\*(.*?)\\*\\*", "<b>$1</b>")
-                .replaceAll("_(.*?)_", "<i>$1</i>");
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+                                               @Override
+                                               public void onClick(View view) {
+                                               playTrailer(trailer.getKey());
+                                               }
+                                          }
+        );
+    }
 
-        holder.content.setText(Html.fromHtml(content));
-        holder.content.setAnimationDuration(750L);
-        holder.content.setInterpolator(new OvershootInterpolator());
-        holder.content.setExpandInterpolator(new OvershootInterpolator());
-        holder.content.setCollapseInterpolator(new OvershootInterpolator());
-
-
-        SpannableString string = new SpannableString( mParentFragment.getString(R.string.read_more) );
-        string.setSpan(new UnderlineSpan(), 0, string.length(), 0);
-        holder.readMore.setText(string);
-        holder.readMore.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(final View v)
-            {
-                holder.content.expand();
-            }
-        });
-
-        ViewTreeObserver vto = holder.content.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                int readMoreVisibility = AndroidUtils.isTextViewEllipsized(holder.content) ? View.VISIBLE : View.INVISIBLE;
-                holder.readMore.setVisibility(readMoreVisibility);
-            }
-        });
-
+    private void playTrailer(String id) {
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse(String.format(NetworkUtils.TRAILER_VIDEO_URL,id)));
+        try {
+            mParentFragment.getContext().startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            mParentFragment.getContext().startActivity(webIntent);
+        }
     }
 
     @Override
@@ -95,21 +82,17 @@ public class ReviewsRecyclerViewAdapter extends RecyclerView.Adapter<ReviewsRecy
         return mValues == null ? 0 : mValues.size();
     }
 
-    public void setData(List<Review> data) {
+    public void setData(List<Trailer> data) {
         mValues = data;
         notifyDataSetChanged();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        final TextView author;
-        final ExpandableTextView content;
-        final TextView readMore;
+        final ImageView image;
 
         ViewHolder(View view) {
             super(view);
-            author = (TextView) view.findViewById(R.id.review_author);
-            content = (ExpandableTextView) view.findViewById(R.id.review_content);
-            readMore = (TextView) view.findViewById(R.id.review_read_more);
+            image = (ImageView) view.findViewById(R.id.trailer_image);
         }
     }
 }

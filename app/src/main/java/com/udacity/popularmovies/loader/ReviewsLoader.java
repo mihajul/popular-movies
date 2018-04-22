@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.udacity.popularmovies.model.Movie;
+import com.udacity.popularmovies.model.Review;
 import com.udacity.popularmovies.utils.JsonUtils;
 import com.udacity.popularmovies.utils.NetworkUtils;
 import com.udacity.popularmovies.utils.PreferencesUtils;
@@ -16,19 +17,21 @@ import java.util.List;
  * Created by Mihai on 3/13/2018.
  */
 
-public class MovieListLoader extends AsyncTaskLoader<List<Movie>> {
-    List<Movie> movies = null;
+public class ReviewsLoader extends AsyncTaskLoader<List<Review>> {
+    List<Review> reviews = null;
     ProgressBar mLoadingIndicator;
+    Integer movieId;
 
-    public MovieListLoader(Context context, ProgressBar mLoadingIndicator) {
+    public ReviewsLoader(Context context, ProgressBar mLoadingIndicator, Integer movieId) {
         super(context);
         this.mLoadingIndicator = mLoadingIndicator;
+        this.movieId = movieId;
     }
 
     @Override
     protected void onStartLoading() {
-        if (movies != null) {
-            deliverResult(movies);
+        if (reviews != null) {
+            deliverResult(reviews);
         } else {
             mLoadingIndicator.setVisibility(View.VISIBLE);
             forceLoad();
@@ -37,16 +40,15 @@ public class MovieListLoader extends AsyncTaskLoader<List<Movie>> {
 
 
     @Override
-    public List<Movie> loadInBackground() {
+    public List<Review> loadInBackground() {
 
         if(!NetworkUtils.isOnline(getContext())) {
             return null;
         }
         try {
-            boolean sortByPopularity = PreferencesUtils.getSort(getContext()) == PreferencesUtils.SORT_BY_POPULARITY;
-            String json = NetworkUtils.getMoviesJson(sortByPopularity);
-            List<Movie> movies = JsonUtils.parseMoviesJson(json);
-            return movies;
+            String json = NetworkUtils.getReviewsJson(movieId);
+            List<Review> reviews = JsonUtils.parseReviewsJson(json);
+            return reviews;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -54,8 +56,8 @@ public class MovieListLoader extends AsyncTaskLoader<List<Movie>> {
     }
 
 
-    public void deliverResult(List<Movie> data) {
-        movies = data;
-        super.deliverResult(movies);
+    public void deliverResult(List<Review> data) {
+        reviews = data;
+        super.deliverResult(data);
     }
 }

@@ -1,6 +1,8 @@
 package com.udacity.popularmovies;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -10,6 +12,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +27,7 @@ import com.udacity.popularmovies.adapter.MovieRecyclerViewAdapter;
 import com.udacity.popularmovies.loader.MovieListLoader;
 import com.udacity.popularmovies.model.Movie;
 import com.udacity.popularmovies.utils.PreferencesUtils;
+
 
 import java.util.List;
 
@@ -46,10 +50,11 @@ public class MovieListActivity extends AppCompatActivity implements LoaderManage
     private RecyclerView recyclerView;
     private ProgressBar mLoadingIndicator;
     private TextView mErrorMessageDisplay;
+    private MovieRecyclerViewAdapter movieRecyclerViewAdapter;
 
     private static final int LOADER_ID = 0;
-    //public static final int COLUMN_WIDTH = 160;
-    private static final String TAG = MovieListActivity.class.getSimpleName();
+    public static final String MOVIE_RESULT_KEY = "movie";
+    private static final String LOG_TAG = MovieListActivity.class.getSimpleName();
 
 
     @Override
@@ -82,19 +87,18 @@ public class MovieListActivity extends AppCompatActivity implements LoaderManage
     @Override
     protected void onResume() {
         super.onResume();
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .registerOnSharedPreferenceChangeListener(this);
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .unregisterOnSharedPreferenceChangeListener(this);
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new MovieRecyclerViewAdapter(this,  mTwoPane));
+        movieRecyclerViewAdapter = new MovieRecyclerViewAdapter(this, mTwoPane);
+        recyclerView.setAdapter(movieRecyclerViewAdapter);
     }
 
     @Override
@@ -138,11 +142,10 @@ public class MovieListActivity extends AppCompatActivity implements LoaderManage
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.action_refresh) {
+        if (id == R.id.action_refresh) {
             getSupportLoaderManager().restartLoader(LOADER_ID, null, MovieListActivity.this);
             return true;
-        }
-        else if (id == R.id.action_sort) {
+        } else if (id == R.id.action_sort) {
             showSortDialog();
             return true;
         }
@@ -157,9 +160,12 @@ public class MovieListActivity extends AppCompatActivity implements LoaderManage
         dialog.show();
 
         RadioGroup rg = (RadioGroup) dialog.findViewById(R.id.radio_group);
-        int radioId =  R.id.sort_by_rating;
-        if(PreferencesUtils.getSort(this) == PreferencesUtils.SORT_BY_POPULARITY) {
+        int radioId = R.id.sort_by_rating;
+        if (PreferencesUtils.getSort(this) == PreferencesUtils.SORT_BY_POPULARITY) {
             radioId = R.id.sort_by_popularity;
+        }
+        if (PreferencesUtils.getSort(this) == PreferencesUtils.SORT_BY_FAVORITES) {
+            radioId = R.id.sort_by_favorites;
         }
         rg.check(radioId);
 
@@ -168,11 +174,14 @@ public class MovieListActivity extends AppCompatActivity implements LoaderManage
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 int sort = PreferencesUtils.SORT_BY_RATING;
-                if(checkedId == R.id.sort_by_popularity) {
+                if (checkedId == R.id.sort_by_popularity) {
                     sort = PreferencesUtils.SORT_BY_POPULARITY;
                 }
+                if (checkedId == R.id.sort_by_favorites) {
+                    sort = PreferencesUtils.SORT_BY_FAVORITES;
+                }
                 PreferencesUtils.setSort(MovieListActivity.this, sort);
-                dialog.hide();
+                dialog.dismiss();
             }
         });
     }
@@ -181,4 +190,26 @@ public class MovieListActivity extends AppCompatActivity implements LoaderManage
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         getSupportLoaderManager().restartLoader(LOADER_ID, null, MovieListActivity.this);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+         if(resultCode == Activity.RESULT_OK){
+             boolean sortByFavorites = PreferencesUtils.getSort(this) == PreferencesUtils.SORT_BY_FAVORITES;
+             if(sortByFavorites) {
+                 getSupportLoaderManager().restartLoader(LOADER_ID, null, MovieListActivity.this);
+                 return;
+             }
+
+             Movie eventMovie= data.getParcelableExtra(MOVIE_RESULT_KEY);
+             for(Movie movie : movieRecyclerViewAdapter.getData()) {
+                 if(movie.getId() == eventMovie.getId()) {
+                    movie.setFavorite(eventMovie.isFavorite());
+                    break;
+                    }
+             }
+         }
+    }
+
+
+
 }

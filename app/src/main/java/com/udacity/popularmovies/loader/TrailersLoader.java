@@ -5,11 +5,10 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.udacity.popularmovies.model.Movie;
 import com.udacity.popularmovies.model.Review;
+import com.udacity.popularmovies.model.Trailer;
 import com.udacity.popularmovies.utils.JsonUtils;
 import com.udacity.popularmovies.utils.NetworkUtils;
-import com.udacity.popularmovies.utils.PreferencesUtils;
 
 import java.util.List;
 
@@ -17,12 +16,12 @@ import java.util.List;
  * Created by Mihai on 3/13/2018.
  */
 
-public class ReviewsLoader extends AsyncTaskLoader<List<Review>> {
-    List<Review> reviews = null;
+public class TrailersLoader extends AsyncTaskLoader<List<Trailer>> {
+    List<Trailer> trailers = null;
     ProgressBar mLoadingIndicator;
     Integer movieId;
 
-    public ReviewsLoader(Context context, ProgressBar mLoadingIndicator, Integer movieId) {
+    public TrailersLoader(Context context, ProgressBar mLoadingIndicator, Integer movieId) {
         super(context);
         this.mLoadingIndicator = mLoadingIndicator;
         this.movieId = movieId;
@@ -30,8 +29,8 @@ public class ReviewsLoader extends AsyncTaskLoader<List<Review>> {
 
     @Override
     protected void onStartLoading() {
-        if (reviews != null) {
-            deliverResult(reviews);
+        if (trailers != null) {
+            deliverResult(trailers);
         } else {
             mLoadingIndicator.setVisibility(View.VISIBLE);
             forceLoad();
@@ -40,15 +39,15 @@ public class ReviewsLoader extends AsyncTaskLoader<List<Review>> {
 
 
     @Override
-    public List<Review> loadInBackground() {
+    public List<Trailer> loadInBackground() {
 
         if(!NetworkUtils.isOnline(getContext())) {
             return null;
         }
         try {
-            String json = NetworkUtils.getReviewsJson(movieId);
-            List<Review> reviews = JsonUtils.parseReviewsJson(json);
-            return reviews;
+            String json = NetworkUtils.getTrailersJson(movieId);
+            List<Trailer> trailers = JsonUtils.parseTrailersJson(json);
+            return trailers;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -56,8 +55,8 @@ public class ReviewsLoader extends AsyncTaskLoader<List<Review>> {
     }
 
 
-    public void deliverResult(List<Review> data) {
-        reviews = data;
+    public void deliverResult(List<Trailer> data) {
+        trailers = data;
         super.deliverResult(data);
     }
 }

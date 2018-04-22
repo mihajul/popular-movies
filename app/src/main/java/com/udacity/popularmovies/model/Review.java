@@ -3,13 +3,11 @@ package com.udacity.popularmovies.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.Date;
 
-
-public class Trailer implements Parcelable {
+public class Review implements Parcelable {
     private String id;
-    private String key;
-    private String name;
+    private String author;
+    private String content;
 
     public String getId() {
         return id;
@@ -19,20 +17,20 @@ public class Trailer implements Parcelable {
         this.id = id;
     }
 
-    public String getKey() {
-        return key;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
-    public String getName() {
-        return name;
+    public String getContent() {
+        return content;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     @Override
@@ -43,29 +41,29 @@ public class Trailer implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
-        dest.writeString(key);
-        dest.writeString(name);
+        dest.writeString(author);
+        dest.writeString(content);
     }
 
-    public Trailer() {
+    public Review() {
 
     }
 
-    private Trailer(Parcel in){
+    private Review(Parcel in){
         id = in.readString();
-        key = in.readString();
-        name = in.readString();
+        author = in.readString();
+        content = in.readString();
     }
 
-    public static final Creator<Trailer> CREATOR = new Creator<Trailer>() {
+    public static final Creator<Review> CREATOR = new Creator<Review>() {
         @Override
-        public Trailer createFromParcel(Parcel parcel) {
-            return new Trailer(parcel);
+        public Review createFromParcel(Parcel parcel) {
+            return new Review(parcel);
         }
 
         @Override
-        public Trailer[] newArray(int i) {
-            return new Trailer[i];
+        public Review[] newArray(int i) {
+            return new Review[i];
         }
 
     };

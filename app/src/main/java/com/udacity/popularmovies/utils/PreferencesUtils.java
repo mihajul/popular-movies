@@ -14,6 +14,7 @@ public class PreferencesUtils {
 
     public static int SORT_BY_RATING = 0;
     public static int SORT_BY_POPULARITY = 1;
+    public static int SORT_BY_FAVORITES = 2;
 
     public static int getSort(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);

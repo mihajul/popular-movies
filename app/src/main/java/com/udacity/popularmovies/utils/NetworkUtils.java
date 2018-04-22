@@ -19,14 +19,44 @@ public class NetworkUtils {
 
     private static final String API_KEY = "your-api-key";
     private static final String API_ROOT = "http://api.themoviedb.org/3/";
+
     private static final String LIST_POPULARITY_URL = API_ROOT + "movie/popular?api_key=" + API_KEY;
     private static final String LIST_RATING_URL = API_ROOT + "movie/top_rated?api_key=" + API_KEY;
-    public  static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w780/";
+    private static final String TRAILERS_URL = API_ROOT + "movie/%s/videos?api_key=" + API_KEY ;
+    private static final String REVIEWS_URL = API_ROOT + "movie/%s/reviews?api_key=" + API_KEY ;
+
+    public static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w780/";
+    public static final String TRAILER_IMAGE_URL = "https://img.youtube.com/vi/%s/hqdefault.jpg";
+    public static final String TRAILER_VIDEO_URL = "https://www.youtube.com/watch?v=%s";
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
     public static String getMoviesJson(boolean byPopularity) {
         String urlString = byPopularity ? LIST_POPULARITY_URL : LIST_RATING_URL;
+        try {
+            URL url = new URL(urlString);
+            return getResponseFromHttpUrl(url);
+        }catch(Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return null;
+    }
+
+    public static String getTrailersJson(int id) {
+        String urlString = String.format(TRAILERS_URL, id);
+
+        try {
+            URL url = new URL(urlString);
+            return getResponseFromHttpUrl(url);
+        }catch(Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return null;
+    }
+
+    public static String getReviewsJson(int id) {
+        String urlString = String.format(REVIEWS_URL, id);
+
         try {
             URL url = new URL(urlString);
             return getResponseFromHttpUrl(url);

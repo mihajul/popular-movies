@@ -91,13 +91,17 @@ public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecycler
             Context context = view.getContext();
             Intent intent = new Intent(context, MovieDetailActivity.class);
             intent.putExtra(MovieDetailFragment.ARG_MOVIE, movie);
-            context.startActivity(intent);
+            mParentActivity.startActivityForResult(intent, 0);
         }
     }
 
     @Override
     public int getItemCount() {
         return mValues == null ? 0 : mValues.size();
+    }
+
+    public List<Movie> getData() {
+        return mValues;
     }
 
     public void setData(List<Movie> data) {
@@ -115,4 +119,6 @@ public class MovieRecyclerViewAdapter extends RecyclerView.Adapter<MovieRecycler
             mTextView = (TextView) view.findViewById(R.id.title);
         }
     }
+
+
 }

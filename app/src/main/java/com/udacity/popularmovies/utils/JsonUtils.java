@@ -3,6 +3,8 @@ package com.udacity.popularmovies.utils;
 import android.util.Log;
 
 import com.udacity.popularmovies.model.Movie;
+import com.udacity.popularmovies.model.Review;
+import com.udacity.popularmovies.model.Trailer;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,10 +27,17 @@ public class JsonUtils {
     private static final String OVERVIEW = "overview";
     private static final String RELEASE_DATE = "release_date";
 
-    private static final SimpleDateFormat DATE_PARSER = new SimpleDateFormat("YYYY-MM-DD");
+    private static final String KEY = "key";
+    private static final String NAME = "name";
+    private static final String AUTHOR = "author";
+    private static final String CONTENT = "content";
+
 
    public static List<Movie> parseMoviesJson(String json) {
-        if (json != null) {
+
+       final SimpleDateFormat DATE_PARSER = new SimpleDateFormat("YYYY-MM-DD");
+
+       if (json != null) {
             List<Movie> movies = new ArrayList<>();
             try {
 
@@ -52,6 +61,56 @@ public class JsonUtils {
                     movies.add(movie);
                 }
                 return  movies;
+            }catch (Exception e) {
+                Log.e( LOG_TAG , e.getMessage());
+            }
+        }
+
+        return null;
+    }
+
+    public static List<Trailer> parseTrailersJson(String json) {
+        if (json != null) {
+            List<Trailer> trailers = new ArrayList<>();
+            try {
+
+                JSONObject jsonObj = new JSONObject(json);
+                JSONArray results = jsonObj.getJSONArray(RESULTS);
+
+                for (int i = 0; i < results.length(); i++) {
+                    JSONObject trailerObj = results.getJSONObject(i);
+                    Trailer trailer = new Trailer();
+                    trailer.setId(trailerObj.getString(ID));
+                    trailer.setKey(trailerObj.getString(KEY));
+                    trailer.setName(trailerObj.getString(NAME));
+                    trailers.add(trailer);
+                }
+                return  trailers;
+            }catch (Exception e) {
+                Log.e( LOG_TAG , e.getMessage());
+            }
+        }
+
+        return null;
+    }
+
+    public static List<Review> parseReviewsJson(String json) {
+        if (json != null) {
+            List<Review> reviews = new ArrayList<>();
+            try {
+
+                JSONObject jsonObj = new JSONObject(json);
+                JSONArray results = jsonObj.getJSONArray(RESULTS);
+
+                for (int i = 0; i < results.length(); i++) {
+                    JSONObject trailerObj = results.getJSONObject(i);
+                    Review review = new Review();
+                    review.setId(trailerObj.getString(ID));
+                    review.setAuthor(trailerObj.getString(AUTHOR));
+                    review.setContent(trailerObj.getString(CONTENT));
+                    reviews.add(review);
+                }
+                return  reviews;
             }catch (Exception e) {
                 Log.e( LOG_TAG , e.getMessage());
             }

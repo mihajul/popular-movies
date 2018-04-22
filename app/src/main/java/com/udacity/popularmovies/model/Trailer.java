@@ -5,72 +5,34 @@ import android.os.Parcelable;
 
 import java.util.Date;
 
-/**
- * Created by Mihai on 3/12/2018.
- */
 
-public class Movie implements Parcelable {
-    private int id;
-    private String title;
-    private String originalTitle;
-    private String imageUrl;
-    private String overview;
-    private double voteAverage;
-    private Date releaseDate;
+public class Trailer implements Parcelable {
+    private String id;
+    private String key;
+    private String name;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
-    public String getTitle() {
-        return title;
+
+    public String getKey() {
+        return key;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setKey(String key) {
+        this.key = key;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getName() {
+        return name;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public String getOverview() {
-        return overview;
-    }
-
-    public void setOverview(String overview) {
-        this.overview = overview;
-    }
-
-    public double getVoteAverage() {
-        return voteAverage;
-    }
-
-    public void setVoteAverage(double voteAverage) {
-        this.voteAverage = voteAverage;
-    }
-
-    public Date getReleaseDate() {
-        return releaseDate;
-    }
-
-    public void setReleaseDate(Date releaseDate) {
-        this.releaseDate = releaseDate;
-    }
-
-    public String getOriginalTitle() {
-        return originalTitle;
-    }
-
-    public void setOriginalTitle(String originalTitle) {
-        this.originalTitle = originalTitle;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
@@ -80,45 +42,30 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeString(title);
-        dest.writeString(originalTitle);
-        dest.writeString(imageUrl);
-        dest.writeString(overview);
-        dest.writeDouble(voteAverage);
-        if(releaseDate != null) {
-            dest.writeLong(releaseDate.getTime());
-        }else {
-            dest.writeLong(0);
-        }
+        dest.writeString(id);
+        dest.writeString(key);
+        dest.writeString(name);
     }
 
-    public Movie() {
+    public Trailer() {
 
     }
 
-    private Movie(Parcel in){
-        id = in.readInt();
-        title = in.readString();
-        originalTitle = in.readString();
-        imageUrl = in.readString();
-        overview = in.readString();
-        voteAverage = in.readDouble();
-        long date = in.readLong();
-        if(date != 0) {
-            releaseDate = new Date(date);
-        }
+    private Trailer(Parcel in){
+        id = in.readString();
+        key = in.readString();
+        name = in.readString();
     }
 
-    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+    public static final Creator<Trailer> CREATOR = new Creator<Trailer>() {
         @Override
-        public Movie createFromParcel(Parcel parcel) {
-            return new Movie(parcel);
+        public Trailer createFromParcel(Parcel parcel) {
+            return new Trailer(parcel);
         }
 
         @Override
-        public Movie[] newArray(int i) {
-            return new Movie[i];
+        public Trailer[] newArray(int i) {
+            return new Trailer[i];
         }
 
     };
